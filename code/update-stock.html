@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Update Stock</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="form-box">
+    <img src="image/logo.jpg" alt="Logo" class="logo">
+    <h2>Update Stock</h2>
+
+    <!-- ✅ 1. Select Brand -->
+    <label>Select Brand:</label>
+    <div class="button-group" id="brand-buttons">
+      <button type="button" onclick="selectBrand('Dell')">Dell</button>
+      <button type="button" onclick="selectBrand('HP')">HP</button>
+      <button type="button" onclick="selectBrand('Lenovo')">Lenovo</button>
+      <button type="button" onclick="selectBrand('Asus')">Asus</button>
+      <button type="button" onclick="selectBrand('Acer')">Acer</button>
+      <button type="button" onclick="selectBrand('Apple')">Apple</button>
+    </div>
+
+    <!-- ✅ 2. Select Processor -->
+    <div id="processor-section" style="display:none;">
+      <label>Select Processor:</label>
+      <div class="button-group" id="processor-buttons">
+        <button type="button" onclick="selectProcessor('Intel i3')">Intel i3</button>
+        <button type="button" onclick="selectProcessor('Intel i5')">Intel i5</button>
+        <button type="button" onclick="selectProcessor('Intel i7')">Intel i7</button>
+        <button type="button" onclick="selectProcessor('Intel i9')">Intel i9</button>
+        <button type="button" onclick="selectProcessor('AMD Ryzen 3')">Ryzen 3</button>
+        <button type="button" onclick="selectProcessor('AMD Ryzen 5')">Ryzen 5</button>
+        <button type="button" onclick="selectProcessor('AMD Ryzen 7')">Ryzen 7</button>
+        <button type="button" onclick="selectProcessor('AMD Ryzen 9')">Ryzen 9</button>
+      </div>
+    </div>
+
+    <!-- ✅ 3. Enter Model -->
+    <div id="model-section" style="display:none;">
+      <label>Enter Model Number:</label>
+      <input type="text" id="model" placeholder="Model Number" required>
+    </div>
+
+    <!-- ✅ 4. Enter Serial Number -->
+    <label>Enter New Serial Number:</label>
+    <input type="text" id="serial" placeholder="Serial Number" required>
+
+    <!-- ✅ 5. Select Supplier -->
+    <label>Select Supplier:</label>
+    <div class="button-group" id="supplier-buttons">
+      <button type="button" onclick="selectSupplier('Blue')">Blue</button>
+      <button type="button" onclick="selectSupplier('Yellow')">Yellow</button>
+    </div>
+    <input type="hidden" id="supplier" required>
+
+    <!-- ✅ 6. Employee Name -->
+    <label>Employee Name:</label>
+    <input type="text" id="employee" placeholder="Your Name" required>
+
+    <!-- ✅ 7. Optional Remarks -->
+    <label>Remarks (optional):</label>
+    <textarea id="remarks" placeholder="Remarks (optional)" rows="2"></textarea>
+
+
+    <!-- ✅ Submit -->
+    <button onclick="submitStockUpdate()">Add to Inventory</button>
+    <p id="updateMessage" class="message"></p>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    let selectedBrand = "";
+    let selectedProcessor = "";
+
+    function selectBrand(brand) {
+      selectedBrand = brand;
+      document.getElementById('processor-section').style.display = "block";
+      highlightSelected('brand-buttons', brand);
+    }
+
+    function selectProcessor(processor) {
+      selectedProcessor = processor;
+      document.getElementById('model-section').style.display = "block";
+      highlightSelected('processor-buttons', processor);
+    }
+
+    function selectSupplier(supplier) {
+      document.getElementById('supplier').value = supplier;
+      highlightSelected('supplier-buttons', supplier);
+    }
+
+   function submitStockUpdate() {
+  const model = document.getElementById("model").value.trim();
+  const serial = document.getElementById("serial").value.trim();
+  const supplier = document.getElementById("supplier").value;
+  const employee = document.getElementById("employee").value.trim();
+  const remarks = document.getElementById("remarks").value.trim(); // ✅ get remarks
+
+  if (!selectedBrand || !selectedProcessor || !model || !serial || !supplier || !employee) {
+    document.getElementById("updateMessage").innerText = "❌ Please complete all fields.";
+    return;
+  }
+
+  const data = {
+    action: "update",
+    brand: selectedBrand,
+    processor: selectedProcessor,
+    model: model,
+    serial: serial,
+    supplier: supplier,
+    employee: employee,
+    remarks: remarks || ""  // ✅ use trimmed remarks
+  };
+
+  fetch('https://script.google.com/macros/s/AKfycbwIMQ9h7t3ndvqBCPIaf4AWM-U7CKdWO2gk5om37Qdr5XKY2vdNSzUMRJtG1hJ5rg7qag/exec', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+  .then(res => res.json())
+  .then(response => {
+    if (response.success) {
+      document.getElementById("updateMessage").innerText = "✅ Laptop added to inventory!";
+      document.getElementById("serial").value = "";
+      document.getElementById("supplier").value = "";
+      document.getElementById("employee").value = "";
+      document.getElementById("remarks").value = ""; // ✅ clear remarks
+      highlightSelected('supplier-buttons', null);
+    } else {
+      document.getElementById("updateMessage").innerText = "❌ Failed to add. Try again.";
+    }
+  })
+  .catch(() => {
+    document.getElementById("updateMessage").innerText = "❌ Network error.";
+  });
+}
+
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 350px;
+    }
+
+    .logo {
+      width: 80px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 14px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <img src="image/logo.jpg" alt="Shop Logo" class="logo">
+    <h1>Inventory Dashboard</h1>
+
+    <button class="btn" onclick="location.href='add-laptop.html'">➕ Add Laptop</button>
+    <button class="btn" onclick="location.href='update-stock.html'">🔁 Update Stock</button>
+    <button class="btn" onclick="location.href='sell-laptop.html'">💵 Sell Laptop</button>
+    <button class="btn" id="view-stock-btn" onclick="location.href='view-stock.html'">📋 View Stock</button>
+  <button class="btn" onclick="location.href='index.html'">🔒 Logout</button>
+
+  </div>
+
+  <script>
+  window.onload = function () {
+    const role = sessionStorage.getItem("role");
+
+    // Hide "View Stock" if not admin
+    if (role !== "admin") {
+      const viewStockBtn = document.getElementById("view-stock-btn");
+      if (viewStockBtn) viewStockBtn.style.display = "none";
+    }
+  };
+</script>
+
+
+</body>
+</html>

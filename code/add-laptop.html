@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add Laptop</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="form-box">
+    <img src="image/logo.jpg" alt="Shop Logo" class="logo">
+    <h2>Add Laptop</h2>
+
+    <form id="addLaptopForm">
+
+      <!-- ✅ Laptop Brand -->
+      <label>Select Brand:</label>
+      <div class="button-group" id="brand-buttons">
+        <button type="button" onclick="selectBrand('Dell')">Dell</button>
+        <button type="button" onclick="selectBrand('HP')">HP</button>
+        <button type="button" onclick="selectBrand('Lenovo')">Lenovo</button>
+        <button type="button" onclick="selectBrand('Asus')">Asus</button>
+        <button type="button" onclick="selectBrand('Acer')">Acer</button>
+        <button type="button" onclick="selectBrand('Apple')">Apple</button>
+      </div>
+      <input type="hidden" id="brand" name="brand" required>
+
+      <!-- ✅ Processor Brand -->
+      <label>Select Processor Brand:</label>
+      <div class="button-group" id="processor-brand-buttons">
+        <button type="button" onclick="selectProcessorBrand('Intel')">Intel</button>
+        <button type="button" onclick="selectProcessorBrand('AMD')">AMD</button>
+      </div>
+
+      <!-- ✅ Processor Model -->
+      <label id="model-label" style="display:none;">Select Processor Model:</label>
+      <div class="button-group" id="processor-model-buttons" style="display:none;"></div>
+      <input type="hidden" id="processor" name="processor" required>
+
+      <!-- ✅ Laptop Details -->
+      <input type="text" id="model" name="model" placeholder="Model" required>
+      <input type="text" id="serial" name="serial" placeholder="Serial Number (Unique)" required>
+      <textarea id="specs" name="specs" placeholder="Specifications" rows="3" required></textarea>
+
+      <!-- ✅ Supplier -->
+      <label>Select Supplier:</label>
+      <div class="button-group" id="supplier-buttons">
+        <button type="button" onclick="selectSupplier('Blue')">Blue</button>
+        <button type="button" onclick="selectSupplier('Yellow')">Yellow</button>
+      </div>
+      <input type="hidden" id="supplier" name="supplier" required>
+
+      <!-- ✅ Employee -->
+      <input type="text" id="employee" name="employee" placeholder="Employee Name" required>
+
+      <!-- ✅ Optional Remarks -->
+      <textarea id="remarks" name="remarks" placeholder="Remarks (optional)" rows="2"></textarea>
+
+      <button type="submit">Add to Inventory</button>
+      <p id="formMessage" class="message"></p>
+    </form>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    function selectSupplier(supplier) {
+      document.getElementById('supplier').value = supplier;
+      highlightSelected('supplier-buttons', supplier);
+    }
+
+    document.getElementById("addLaptopForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const data = {
+        action: "add",
+        brand: document.getElementById("brand").value,
+        processor: document.getElementById("processor").value,
+        model: document.getElementById("model").value,
+        serial: document.getElementById("serial").value,
+        specs: document.getElementById("specs").value,
+        supplier: document.getElementById("supplier").value,
+        employee: document.getElementById("employee").value,
+        remarks: document.getElementById("remarks").value || ""
+      };
+
+      fetch("https://script.google.com/macros/s/AKfycbwIMQ9h7t3ndvqBCPIaf4AWM-U7CKdWO2gk5om37Qdr5XKY2vdNSzUMRJtG1hJ5rg7qag/exec", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+      .then(res => res.json())
+      .then(response => {
+        document.getElementById("formMessage").innerText = response.success ? "✅ Laptop added!" : "❌ " + response.message;
+      })
+      .catch(() => {
+        document.getElementById("formMessage").innerText = "❌ Network or server error.";
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sell Laptop</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .form-box {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    .message {
+      text-align: center;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-box">
+    <img src="image/logo.jpg" alt="Logo" class="logo">
+    <h2>💵 Sales Entry</h2>
+
+    <input type="text" id="serial" placeholder="Enter Serial Number" required>
+    <input type="text" id="customerName" placeholder="Customer Name" required>
+    <input type="text" id="customerNumber" placeholder="Customer Mobile Number" required>
+    <input type="text" id="employee" placeholder="Employee Name" required>
+    <input type="text" id="remarks" placeholder="Remarks (optional)">
+
+    <button onclick="sellLaptop()">Sold</button>
+    <p class="message" id="sellMessage"></p>
+  </div>
+
+  <script>
+    function sellLaptop() {
+      const serial = document.getElementById("serial").value.trim();
+      const customerName = document.getElementById("customerName").value.trim();
+      const customerNumber = document.getElementById("customerNumber").value.trim();
+      const employee = document.getElementById("employee").value.trim();
+      const remarks = document.getElementById("remarks").value.trim();
+
+      if (!serial || !customerName || !customerNumber || !employee) {
+        document.getElementById("sellMessage").innerText = "❌ Please fill all fields.";
+        return;
+      }
+
+      const payload = {
+        action: "sell",
+        serial,
+        customerName,
+        customerNumber,
+        employee,
+        remarks
+      };
+
+      fetch('https://script.google.com/macros/s/AKfycbwIMQ9h7t3ndvqBCPIaf4AWM-U7CKdWO2gk5om37Qdr5XKY2vdNSzUMRJtG1hJ5rg7qag/exec', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById("sellMessage").innerText = "✅ Laptop sold successfully!";
+          document.getElementById("serial").value = "";
+          document.getElementById("customerName").value = "";
+          document.getElementById("customerNumber").value = "";
+          document.getElementById("employee").value = "";
+          document.getElementById("remarks").value = "";
+        } else {
+          document.getElementById("sellMessage").innerText = "❌ " + data.message;
+        }
+      })
+      .catch(() => {
+        document.getElementById("sellMessage").innerText = "❌ Network error.";
+      });
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>View Stock</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      padding: 20px;
+    }
+
+    .form-box {
+      width: 95%;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .logo {
+      width: 100px;
+      height: auto;
+      display: block;
+      margin: 0 auto 10px;
+    }
+
+    h2, h3 {
+      text-align: center;
+    }
+
+    .summary {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 15px;
+      margin-bottom: 20px;
+    }
+
+    .summary p {
+      margin: 6px 0;
+    }
+
+    .stock-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+
+    .stock-table th, .stock-table td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .stock-table th {
+      background-color: #e9ecef;
+    }
+
+    .brand-section {
+      margin-bottom: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-box">
+    <img src="image/logo.jpg" alt="Logo" class="logo">
+    <h2>📋 Current Inventory</h2>
+
+    <!-- ✅ Summary Section -->
+    <div class="summary" id="summaryBox">
+      <p>🔄 Loading summary...</p>
+    </div>
+
+    <!-- ✅ Inventory Tables by Brand -->
+    <div id="stockTableWrapper">
+      <p>🔄 Loading stock...</p>
+    </div>
+  </div>
+
+  <script>
+    fetch('https://script.google.com/macros/s/1N10mog0o5_-he9VpzJFUxhdcfW8GdENodfDU061BBTY/exec')
+      .then(res => res.json())
+      .then(data => {
+        const summary = document.getElementById("summaryBox");
+        const tableWrapper = document.getElementById("stockTableWrapper");
+        tableWrapper.innerHTML = "";
+        summary.innerHTML = "";
+
+        if (data.length === 0) {
+          tableWrapper.innerHTML = "<p>No laptops in stock.</p>";
+          summary.innerHTML = "<p>No data available.</p>";
+          return;
+        }
+
+        const brandGroups = {};
+        const processorCount = {};
+        let total = 0;
+
+        data.forEach(item => {
+          const brand = item.brand;
+          const processor = item.processor;
+
+          if (!brandGroups[brand]) brandGroups[brand] = [];
+          brandGroups[brand].push(item);
+
+          processorCount[processor] = (processorCount[processor] || 0) + 1;
+          total++;
+        });
+
+        const brandCount = Object.fromEntries(
+          Object.entries(brandGroups).map(([b, arr]) => [b, arr.length])
+        );
+
+        const formatMap = obj => Object.entries(obj).map(([k, v]) => `${k}: ${v}`).join(', ');
+
+        summary.innerHTML = `
+          <p>🏷️ <strong>By Brand:</strong> ${formatMap(brandCount)}</p>
+          <p>🧠 <strong>By Processor:</strong> ${formatMap(processorCount)}</p>
+          <p>📦 <strong>Total Laptops:</strong> ${total}</p>
+        `;
+
+        for (const brand in brandGroups) {
+          const section = document.createElement("div");
+          section.className = "brand-section";
+          section.innerHTML = `<h3>💻 ${brand}</h3>`;
+
+          const table = document.createElement("table");
+          table.className = "stock-table";
+
+          const thead = document.createElement("thead");
+          thead.innerHTML = `
+            <tr>
+              <th>Processor</th>
+              <th>Model</th>
+              <th>Serial</th>
+              <th>Specs</th>
+              <th>Date Added</th>
+              <th>Supplier</th>
+            </tr>
+          `;
+          table.appendChild(thead);
+
+          const tbody = document.createElement("tbody");
+          brandGroups[brand].forEach(row => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${row.processor}</td>
+              <td>${row.model}</td>
+              <td>${row.serial}</td>
+              <td>${row.specs}</td>
+              <td>${row.dateadded}</td>
+              <td>${row.supplier}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+
+          table.appendChild(tbody);
+          section.appendChild(table);
+          tableWrapper.appendChild(section);
+        }
+      })
+      .catch(() => {
+        document.getElementById("summaryBox").innerHTML = "<p>❌ Could not load summary.</p>";
+        document.getElementById("stockTableWrapper").innerHTML = "<p>❌ Failed to load tables.</p>";
+      });
+  </script>
+
+</body>
+</html>
